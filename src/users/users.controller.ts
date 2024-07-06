@@ -3,6 +3,7 @@ import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Query } f
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -13,6 +14,7 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Post()
+  @UseGuards(AuthGuard())
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.createUser(createUserDto);
   }

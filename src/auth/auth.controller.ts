@@ -8,6 +8,6 @@ export class AuthController {
 
     @Post('/login')
     async login(@Body() AuthCredentialsDto: AuthCredentialsDto): Promise<{accessToken: string}>{
-        return this.authService.login(authCredentialsDto);
+        return this.authService.login(AuthCredentialsDto);
     }
 }
