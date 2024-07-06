@@ -50,4 +50,20 @@ export class UsersService {
     user.isActive = false;
     await this.userRepository.save(user);
   }
+
+  async getUsers(filterDto: GetUsersFilterDto): Promise<User[]> {
+    const { username, email } = filterDto;
+    const query = this.userRepository.createQueryBuilder('user');
+  
+    if (username) {
+      query.andWhere('user.username LIKE :username', { username: `%${username}%` });
+    }
+  
+    if (email) {
+      query.andWhere('user.email LIKE :email', { email: `%${email}%` });
+    }
+  
+    const users = await query.getMany();
+    return users;
+  }
 }
