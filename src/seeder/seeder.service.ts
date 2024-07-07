@@ -12,9 +12,16 @@ export class SeederService {
       email: 'admin@example.com',
       password: 'admin123',
       fullName: 'Admin User',
-      roles: ['admin'], 
+      roles: ['admin'],
     };
 
-    await this.usersService.createUser(adminUser);
+    const existingUser = await this.usersService.findByUsername(
+      adminUser.username,
+    );
+    if (!existingUser) {
+      await this.usersService.createUser(adminUser);
+    } else {
+      console.log('Admin user already exists');
+    }
   }
 }

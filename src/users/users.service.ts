@@ -55,10 +55,11 @@ export class UsersService {
     return user;
   }
 
-  async deleteUser(id: number): Promise<void> {
+  async deleteUser(id: number): Promise<void | string> {
     const user = await this.getUserById(id);
     user.isActive = false;
     await this.userRepository.save(user);
+    return "this user is soft deleted"
   }
 
   async getUsers(filterDto: GetUsersFilterDto): Promise<{ users: User[], total: number }> {
