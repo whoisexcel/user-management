@@ -8,37 +8,35 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { User } from './user.entity';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Post()
-  @UseGuards(AuthGuard())
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.createUser(createUserDto);
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard())
   async getUserById(@Param('id') id: number): Promise<User> {
     return this.usersService.getUserById(id);
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard())
   async updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto): Promise<User> {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard())
   async deleteUser(@Param('id') id: number): Promise<void> {
     return this.usersService.deleteUser(id);
   }
 
   @Get()
-  @UseGuards(AuthGuard(), RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   async getUsers(@Query() filterDto: GetUsersFilterDto): Promise<User[]> {
     return this.usersService.getUsers(filterDto);

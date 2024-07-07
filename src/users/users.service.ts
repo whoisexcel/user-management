@@ -25,6 +25,7 @@ export class UsersService {
       fullName,
     });
 
+  
     await this.userRepository.save(user);
     return user;
   }
@@ -62,7 +63,9 @@ export class UsersService {
     const query = this.userRepository.createQueryBuilder('user');
 
     if (username) {
-      query.andWhere('user.username LIKE :username', { username: `%${username}%` });
+      query.andWhere('user.username LIKE :username', {
+        username: `%${username}%`,
+      });
     }
 
     if (email) {
