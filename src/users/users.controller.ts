@@ -10,13 +10,12 @@ import { Roles } from '../auth/roles.decorator';
 import { User } from './user.entity';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 
-@Controller('users')
+@Controller('api/users')
 
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Post()
-//   @UseGuards(JwtAuthGuard)
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.createUser(createUserDto);
   }
@@ -41,7 +40,7 @@ export class UsersController {
   }
 
   @Get()
-//   @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   async getUsers(@Query() filterDto: GetUsersFilterDto): Promise<User[]> {
     return this.usersService.getUsers(filterDto);

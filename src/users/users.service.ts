@@ -59,8 +59,8 @@ export class UsersService {
   }
 
   async getUsers(filterDto: GetUsersFilterDto): Promise<User[]> {
-    const { username, email } = filterDto;
-    const query = this.userRepository.createQueryBuilder('user');
+    const { username, email } = filterDto || {};
+    const query = this.userRepository.createQueryBuilder('users');
 
     if (username) {
       query.andWhere('user.username LIKE :username', {
