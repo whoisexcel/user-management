@@ -1,5 +1,4 @@
-// src/users/dto/get-users-filter.dto.ts
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsEmail, IsNumber, Min } from 'class-validator';
 
 export class GetUsersFilterDto {
   @IsOptional()
@@ -7,6 +6,16 @@ export class GetUsersFilterDto {
   username?: string;
 
   @IsOptional()
-  @IsString()
+  @IsEmail()
   email?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  limit?: number;
 }

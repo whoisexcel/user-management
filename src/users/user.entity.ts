@@ -17,6 +17,9 @@ export class User {
   @Column()
   fullName: string;
 
+  @Column('simple-array')
+  roles: string[];
+
   @Column({ default: true })
   isActive: boolean;
 }

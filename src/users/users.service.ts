@@ -15,7 +15,7 @@ export class UsersService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const { username, email, password, fullName } = createUserDto;
+    const { username, email, password, fullName, roles } = createUserDto;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = this.userRepository.create({
@@ -23,15 +23,18 @@ export class UsersService {
       email,
       password: hashedPassword,
       fullName,
+      roles: roles || ['user']
     });
 
-  
     await this.userRepository.save(user);
     return user;
   }
 
   async getUserById(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['id', 'username', 'email', 'fullName'],
+    });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
@@ -58,21 +61,23 @@ export class UsersService {
     await this.userRepository.save(user);
   }
 
-  async getUsers(filterDto: GetUsersFilterDto): Promise<User[]> {
-    const { username, email } = filterDto || {};
-    const query = this.userRepository.createQueryBuilder('users');
+  async getUsers(filterDto: GetUsersFilterDto): Promise<{ users: User[], total: number }> {
+    const { username, email, page = 1, limit = 10 } = filterDto;
+
+    const query = this.userRepository.createQueryBuilder('user');
 
     if (username) {
-      query.andWhere('user.username LIKE :username', {
-        username: `%${username}%`,
-      });
+      query.andWhere('user.username LIKE :username', { username: `%${username}%` });
     }
 
     if (email) {
       query.andWhere('user.email LIKE :email', { email: `%${email}%` });
     }
 
-    const users = await query.getMany();
-    return users;
+    query.skip((page - 1) * limit).take(limit);
+
+    const [users, total] = await query.getManyAndCount();
+
+    return { users, total };
   }
 }

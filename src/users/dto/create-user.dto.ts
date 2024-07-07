@@ -6,7 +6,7 @@ export class CreateUserDto {
   readonly username: string;
 
   @IsNotEmpty()
-  @IsEmail()
+  @IsEmail({}, { message: 'Invalid email format' })
   readonly email: string;
 
   @IsNotEmpty()
@@ -16,4 +16,8 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   readonly fullName: string;
+
+  @IsString()
+  readonly roles?: string[];
 }
+

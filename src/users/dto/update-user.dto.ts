@@ -8,4 +8,8 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   readonly fullName?: string;
+
+  @IsOptional()
+  @IsString()
+  readonly role?: string;
 }

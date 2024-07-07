@@ -42,7 +42,7 @@ export class UsersController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  async getUsers(@Query() filterDto: GetUsersFilterDto): Promise<User[]> {
+  async getUsers(@Query() filterDto: GetUsersFilterDto): Promise<{ users: User[], total: number }> {
     return this.usersService.getUsers(filterDto);
   }
 }

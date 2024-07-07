@@ -1,10 +1,11 @@
-import { Module, MiddlewareConsumer } from '@nestjs/common';
+import { Module, MiddlewareConsumer, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { User } from './users/user.entity';
+import { SeederService } from './seeder/seeder.service';
 
 @Module({
   imports: [
@@ -26,9 +27,18 @@ import { User } from './users/user.entity';
     UsersModule,
     AuthModule,
   ],
+  providers: [SeederService],
 })
-export class AppModule {
+export class AppModule implements OnModuleInit{
+
+  constructor(private seederService: SeederService) {}
+
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
   }
+
+  async onModuleInit() {
+    await this.seederService.seed(); 
+  }
+
 }
