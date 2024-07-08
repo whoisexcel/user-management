@@ -12,4 +12,4 @@ RUN npm run build
 
 EXPOSE 3000
 
-CMD npm run typeorm:run-migrations && npm run start:dev
+CMD ["node", "dist/main"]
