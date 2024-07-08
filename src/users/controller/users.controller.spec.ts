@@ -1,12 +1,9 @@
-// src/users/users.controller.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { GetUsersFilterDto } from './dto/get-users-filter.dto';
-import { User } from '../users/user.entity';
-import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { UsersService } from '../service/users.service';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { GetUsersFilterDto } from '../dto/get-users-filter.dto';
 
 describe('UsersController', () => {
   let controller: UsersController;

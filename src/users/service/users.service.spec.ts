@@ -1,11 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { UserRepository } from './user.repository';
-import { User } from './user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { GetUsersFilterDto } from './dto/get-users-filter.dto';
-import { NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+import { UserRepository } from '../user.repository';
+import { User } from '../entity/user.entity';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { GetUsersFilterDto } from '../dto/get-users-filter.dto';
+import {
+  NotFoundException,
+  ConflictException,
+  BadRequestException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 jest.mock('bcrypt');
@@ -74,7 +78,9 @@ describe('UsersService', () => {
 
       const result = await service.createUser(createUserDto);
       expect(result).toEqual(mockUser);
-      expect(repository.findOne).toHaveBeenCalledWith({ where: [{ username: 'testuser' }, { email: 'test@example.com' }] });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: [{ username: 'testuser' }, { email: 'test@example.com' }],
+      });
       expect(repository.create).toHaveBeenCalledWith({
         username: 'testuser',
         email: 'test@example.com',
@@ -96,7 +102,9 @@ describe('UsersService', () => {
         roles: ['user'],
       };
 
-      await expect(service.createUser(createUserDto)).rejects.toThrow(ConflictException);
+      await expect(service.createUser(createUserDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
 
     it('should throw BadRequestException if required fields are missing', async () => {
@@ -108,7 +116,9 @@ describe('UsersService', () => {
         roles: ['user'],
       };
 
-      await expect(service.createUser(createUserDto)).rejects.toThrow(BadRequestException);
+      await expect(service.createUser(createUserDto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -149,7 +159,7 @@ describe('UsersService', () => {
       jest.spyOn(repository, 'save').mockResolvedValue(mockUser as any);
 
       const result = await service.deleteUser(1);
-      expect(result).toBe("this user is soft deleted");
+      expect(result).toBe('this user is soft deleted');
       expect(repository.save).toHaveBeenCalledWith(mockUser);
     });
   });

@@ -1,10 +1,15 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserRepository } from './user.repository';
-import { User } from './user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { GetUsersFilterDto } from './dto/get-users-filter.dto';
+import { UserRepository } from '../user.repository';
+import { User } from '../entity/user.entity';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { GetUsersFilterDto } from '../dto/get-users-filter.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -36,7 +41,7 @@ export class UsersService {
       email,
       password: hashedPassword,
       fullName,
-      roles: roles || ['user']
+      roles: roles || ['user'],
     });
 
     await this.userRepository.save(user);
@@ -72,16 +77,20 @@ export class UsersService {
     const user = await this.getUserById(id);
     user.isActive = false;
     await this.userRepository.save(user);
-    return "this user is soft deleted"
+    return 'this user is soft deleted';
   }
 
-  async getUsers(filterDto: GetUsersFilterDto): Promise<{ users: User[], total: number }> {
+  async getUsers(
+    filterDto: GetUsersFilterDto,
+  ): Promise<{ users: User[]; total: number }> {
     const { username, email, page = 1, limit = 10 } = filterDto;
 
     const query = this.userRepository.createQueryBuilder('user');
 
     if (username) {
-      query.andWhere('user.username LIKE :username', { username: `%${username}%` });
+      query.andWhere('user.username LIKE :username', {
+        username: `%${username}%`,
+      });
     }
 
     if (email) {

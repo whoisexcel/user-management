@@ -1,8 +1,7 @@
-// src/auth/auth.controller.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { AuthService } from '../service/auth.service';
+import { AuthCredentialsDto } from '../dto/auth-credentials.dto';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -37,7 +36,10 @@ describe('AuthController', () => {
 
   describe('login', () => {
     it('should return an access token', async () => {
-      const authCredentialsDto: AuthCredentialsDto = { username: 'testuser', password: 'testpass' };
+      const authCredentialsDto: AuthCredentialsDto = {
+        username: 'testuser',
+        password: 'testpass',
+      };
       const result = await authController.login(authCredentialsDto);
       expect(result).toEqual({ accessToken: 'testAccessToken' });
       expect(authService.login).toHaveBeenCalledWith(authCredentialsDto);
