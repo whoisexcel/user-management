@@ -2,7 +2,7 @@
 FROM node:20-alpine
 
 # Set the working directory in the container
-WORKDIR /user/src/app
+WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
@@ -19,5 +19,5 @@ RUN npm run build
 # Expose the port the app runs on
 EXPOSE 3000
 
-# Define the command to run the application
-CMD ["node", "dist/main"]
+# Define the command to run the application and migrations
+CMD ["sh", "-c", "npm run typeorm migration:run && npm run start:prod"]

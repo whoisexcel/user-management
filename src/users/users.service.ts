@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from './user.repository';
 import { User } from './user.entity';
@@ -16,6 +16,19 @@ export class UsersService {
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { username, email, password, fullName, roles } = createUserDto;
+
+    if (!username || !email || !password || !fullName) {
+      throw new BadRequestException('Missing required fields');
+    }
+
+    const existingUser = await this.userRepository.findOne({
+      where: [{ username }, { email }],
+    });
+
+    if (existingUser) {
+      throw new ConflictException('Username or email already exists');
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = this.userRepository.create({
