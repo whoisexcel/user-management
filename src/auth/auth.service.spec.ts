@@ -1,49 +1,88 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
-import { UserRepository } from '../users/user.repository';
-import { NotFoundException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { UnauthorizedException } from '@nestjs/common';
+import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import * as bcrypt from 'bcrypt';
 
-describe('UsersService', () => {
-  let service: UsersService;
-  let repository: UserRepository;
+jest.mock('bcrypt');
+
+describe('AuthService', () => {
+  let authService: AuthService;
+  let usersService: UsersService;
+  let jwtService: JwtService;
+  let configService: ConfigService;
+
+  const mockUsersService = {
+    findByUsername: jest.fn(),
+  };
+
+  const mockJwtService = {
+    sign: jest.fn(),
+  };
+
+  const mockConfigService = {
+    get: jest.fn().mockReturnValue('testSecret'),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UsersService,
-        {
-          provide: UserRepository,
-          useValue: {
-            createUser: jest.fn(),
-            findOne: jest.fn(),
-            save: jest.fn(),
-            delete: jest.fn(),
-          },
-        },
+        AuthService,
+        { provide: UsersService, useValue: mockUsersService },
+        { provide: JwtService, useValue: mockJwtService },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
-    service = module.get<UsersService>(UsersService);
-    repository = module.get<UserRepository>(UserRepository);
+    authService = module.get<AuthService>(AuthService);
+    usersService = module.get<UsersService>(UsersService);
+    jwtService = module.get<JwtService>(JwtService);
+    configService = module.get<ConfigService>(ConfigService);
+
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(authService).toBeDefined();
   });
 
-  describe('getUserById', () => {
-    it('should return the user if found', async () => {
-      const mockUser = { id: 1, username: 'Test User' };
-      jest.spyOn(repository, 'findOne').mockResolvedValue(mockUser as any);
+  describe('validateUser', () => {
+    it('should return user without password if validation is successful', async () => {
+      const mockUser = { username: 'testuser', password: 'testpass' };
+      jest.spyOn(usersService, 'findByUsername').mockResolvedValue(mockUser as any);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-      const result = await service.getUserById(1);
-      expect(result).toEqual(mockUser);
+      const result = await authService.validateUser('testuser', 'testpass');
+      expect(result).toEqual({ username: 'testuser' });
     });
 
-    it('should throw a NotFoundException if user not found', async () => {
-      jest.spyOn(repository, 'findOne').mockResolvedValue(null);
+    it('should return null if validation fails', async () => {
+      jest.spyOn(usersService, 'findByUsername').mockResolvedValue(null);
 
-      await expect(service.getUserById(1)).rejects.toThrow(NotFoundException);
+      const result = await authService.validateUser('invaliduser', 'testpass');
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('login', () => {
+    it('should return an access token if credentials are valid', async () => {
+      const authCredentialsDto: AuthCredentialsDto = { username: 'testuser', password: 'testpass' };
+      const mockUser = { username: 'testuser', password: 'testpass', role: 'user' };
+      jest.spyOn(authService, 'validateUser').mockResolvedValue(mockUser as any);
+      jest.spyOn(jwtService, 'sign').mockReturnValue('testToken');
+
+      const result = await authService.login(authCredentialsDto);
+      expect(result).toEqual({ accessToken: 'testToken' });
+    });
+
+    it('should throw an UnauthorizedException if credentials are invalid', async () => {
+      const authCredentialsDto: AuthCredentialsDto = { username: 'invaliduser', password: 'testpass' };
+      jest.spyOn(authService, 'validateUser').mockResolvedValue(null);
+
+      await expect(authService.login(authCredentialsDto)).rejects.toThrow(UnauthorizedException);
     });
   });
 });
