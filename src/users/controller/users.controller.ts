@@ -8,7 +8,6 @@ import {
   Body,
   UseGuards,
   Query,
-  Res,
 } from '@nestjs/common';
 import { UsersService } from '../service/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -24,6 +23,8 @@ import { RolesGuard } from '../../auth/roles.guard';
 import { Roles } from '../../auth/roles.decorator';
 import { User } from '../entity/user.entity';
 import { JwtAuthGuard } from '../../auth/jwt.guard';
+import { CustomHeader } from '../../custom-header.decorator';
+import { ParseIntPipe } from '../../parse-int.pipe';
 
 @ApiTags('users')
 @Controller('api/users')
@@ -39,7 +40,7 @@ export class UsersController {
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   @ApiResponse({ status: 409, description: 'Conflict.' })
-  async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+  async createUser(@Body() createUserDto: CreateUserDto, @CustomHeader('x-custom-header') customHeaderValue: string): Promise<User> {
     return this.usersService.createUser(createUserDto);
   }
 
@@ -49,17 +50,20 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Return a user by ID.' })
   @ApiResponse({ status: 401, description: 'Unauthorised.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  async getUserById(@Param('id') id: number): Promise<User> {
+  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.usersService.getUserById(id);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Update a user by ID' })
-  @ApiResponse({ status: 200, description: 'The user has been successfully updated.' })
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully updated.',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   async updateUser(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
     return this.usersService.updateUser(id, updateUserDto);
@@ -74,7 +78,7 @@ export class UsersController {
   })
   @ApiResponse({ status: 401, description: 'unauthorised.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  async deleteUser(@Param('id') id: number): Promise<void | string> {
+  async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<void | string> {
     return this.usersService.deleteUser(id);
   }
 
