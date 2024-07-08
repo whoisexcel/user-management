@@ -25,4 +25,3 @@ export class CreateUserDto {
   @IsString()
   readonly roles?: string[];
 }
-

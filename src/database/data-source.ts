@@ -1,12 +1,11 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { User } from '../users/entity/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ConfigModuleOptions } from '@nestjs/config/dist/interfaces';
-import { join } from 'path';
+
 
 ConfigModule.forRoot({
   isGlobal: true,
-} as ConfigModuleOptions);
+});
 
 const configService = new ConfigService();
 
@@ -18,7 +17,9 @@ export const dataSourceOptions: DataSourceOptions = {
   password: configService.get<string>('DB_PASSWORD'),
   database: configService.get<string>('DB_NAME'),
   entities: [User],
-  migrations: ['dist/migrations/*{.ts,.js}'],
+  migrations: ['./src/migrations/*.ts'],
+  synchronize: false,
+  logging: true,
 };
 
 const dataSource = new DataSource(dataSourceOptions);

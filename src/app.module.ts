@@ -15,7 +15,7 @@ import { RateLimiterMiddleware } from './middleware/rate-limiter.middleware';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async () => {
-        await dataSource.initialize();  
+        await dataSource.initialize();
         return dataSource.options;
       },
     }),
@@ -30,9 +30,7 @@ export class AppModule implements OnModuleInit {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
 
-    consumer
-      .apply(RateLimiterMiddleware)
-      .forRoutes('api/users');
+    consumer.apply(RateLimiterMiddleware).forRoutes('api/users');
   }
 
   async onModuleInit() {
