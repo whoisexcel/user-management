@@ -66,6 +66,9 @@ export class UsersService {
 
   async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.getUserById(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
     const { email, fullName } = updateUserDto;
     user.email = email;
     user.fullName = fullName;
@@ -75,6 +78,9 @@ export class UsersService {
 
   async deleteUser(id: number): Promise<void | string> {
     const user = await this.getUserById(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
     user.isActive = false;
     await this.userRepository.save(user);
     return 'this user is soft deleted';

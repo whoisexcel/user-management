@@ -37,7 +37,8 @@ export class UsersController {
     status: 201,
     description: 'The user has been successfully created.',
   })
-  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @ApiResponse({ status: 409, description: 'Conflict.' })
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.createUser(createUserDto);
   }
@@ -46,6 +47,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get a user by ID' })
   @ApiResponse({ status: 200, description: 'Return a user by ID.' })
+  @ApiResponse({ status: 401, description: 'Unauthorised.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   async getUserById(@Param('id') id: number): Promise<User> {
     return this.usersService.getUserById(id);
@@ -53,6 +55,9 @@ export class UsersController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update a user by ID' })
+  @ApiResponse({ status: 200, description: 'The user has been successfully updated.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
   async updateUser(
     @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto,
@@ -67,6 +72,7 @@ export class UsersController {
     status: 200,
     description: 'The user has been successfully deleted.',
   })
+  @ApiResponse({ status: 401, description: 'unauthorised.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   async deleteUser(@Param('id') id: number): Promise<void | string> {
     return this.usersService.deleteUser(id);

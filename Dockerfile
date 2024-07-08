@@ -19,5 +19,5 @@ RUN npm run build
 # Expose the port the app runs on
 EXPOSE 3000
 
-# Define the command to run the application and migrations
-CMD [ "npm", "run", "start:dev" ]
+# Run TypeORM migrations and start the application
+CMD npm run typeorm:run-migrations && npm run start:dev
