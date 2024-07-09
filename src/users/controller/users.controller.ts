@@ -40,7 +40,7 @@ export class UsersController {
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   @ApiResponse({ status: 409, description: 'Conflict.' })
-  async createUser(@Body() createUserDto: CreateUserDto, @CustomHeader('x-custom-header') customHeaderValue: string): Promise<User> {
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.createUser(createUserDto);
   }
 
