@@ -1,4 +1,4 @@
-This is a User Management Application built with Nestjs, Postgress and Typescript.
+This is a User Management Application built with Nestjs, Postgress and Typescript...
 
 After the application is cloned, use command `npm install` to install dependencies. Create a `.env` file for connection to postgress database. The sample for the values required for database connection is shown in `.env.sample` file.
 
